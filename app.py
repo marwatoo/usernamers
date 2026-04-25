@@ -105,15 +105,14 @@ def check_reddit(username):
 # ── TikTok ─────────────────────────────────────────────────────────────────
 def check_tiktok(username):
     try:
-        res = requests.get(
-            f"https://www.tiktok.com/@{username}",
-            headers=HEADERS, timeout=8
-        )
-        text = res.text
-        if '"statusCode":10202' in text or "Couldn't find this account" in text:
-            return "available"
-        if res.status_code == 200:
+        url = f"https://www.tiktok.com/api/user/detail/?uniqueId={username}&aid=1988&app_language=en"
+        res = requests.get(url, headers=HEADERS, timeout=8)
+        data = res.json()
+        status_code = data.get("statusCode", -1)
+        if status_code == 0:
             return "taken"
+        if status_code == 10202:
+            return "available"
         return "unknown"
     except Exception:
         return "unknown"
